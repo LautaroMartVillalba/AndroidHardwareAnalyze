@@ -7,6 +7,21 @@ import android.os.BatteryManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 
+/**
+ * The Battery class provides detailed information about the device's battery state.
+ *
+ * It retrieves metrics such as the current charge percentage, charging status,
+ * charging source, and temperature. This class is designed to encapsulate all
+ * battery-related queries, ensuring a single point of access for battery data.
+ *
+ * Requirements:
+ * - API level 28 (Android P) or higher for most features.
+ *
+ * @property context The application context used to access system services and broadcast intents.
+ * @property batteryStatus Pre-fetched string describing the battery percentage and general status.
+ * @property batteryCharging Pre-fetched string describing the current charging method (AC, USB, Wireless).
+ * @property batteryTempAndVolt Pre-fetched string describing the current battery temperature in Celsius.
+ */
 class Battery(localContext: Context) {
 
     val context = localContext
@@ -18,6 +33,14 @@ class Battery(localContext: Context) {
     @RequiresApi(Build.VERSION_CODES.P)
     val batteryTempAndVolt = obtainBatteryTempAndVolt()
 
+    /**
+     * Retrieves the current battery percentage and general status.
+     *
+     * The status may include states such as Charging, Discharging,
+     * Full, Connected without charging, or Disconnected.
+     *
+     * @return A formatted string with the current battery percentage and status.
+     */
     @RequiresApi(Build.VERSION_CODES.P)
     fun obtainBatteryStatus(): String {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
@@ -39,6 +62,15 @@ class Battery(localContext: Context) {
             Status: $statusString
             """.trimIndent()
     }
+
+    /**
+     * Identifies the power source currently used for charging the battery.
+     *
+     * The result indicates whether the device is charging via AC, USB,
+     * Wireless charging, or not charging at all.
+     *
+     * @return A formatted string with the charging method.
+     */
     @RequiresApi(Build.VERSION_CODES.P)
     fun obtainBatteryCharging(): String {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
@@ -56,6 +88,15 @@ class Battery(localContext: Context) {
             Charging by: $pluggedString
             """.trimIndent()
     }
+
+    /**
+     * Retrieves the current battery temperature.
+     *
+     * The temperature is expressed in degrees Celsius and is obtained from
+     * the battery change broadcast intent.
+     *
+     * @return A formatted string with the battery temperature in Celsius.
+     */
     @RequiresApi(Build.VERSION_CODES.P)
     fun obtainBatteryTempAndVolt(): String {
         val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
