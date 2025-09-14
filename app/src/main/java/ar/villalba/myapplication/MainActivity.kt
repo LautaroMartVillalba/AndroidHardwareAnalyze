@@ -1,6 +1,12 @@
 package ar.villalba.myapplication
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Build
+import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,67 +17,61 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import ar.villalba.myapplication.getters.Battery
-import ar.villalba.myapplication.getters.CPU
-import ar.villalba.myapplication.getters.Device
-import ar.villalba.myapplication.getters.JSONResponse
-import ar.villalba.myapplication.getters.RAM
-import ar.villalba.myapplication.getters.Screen
-import ar.villalba.myapplication.getters.Sensor
-import ar.villalba.myapplication.getters.Storage
+import androidx.compose.ui.unit.dp
+import ar.villalba.myapplication.getters.*
 import ar.villalba.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
 
-    @RequiresApi(Build.VERSION_CODES.R)
+    @RequiresApi(TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
-            MyApplicationTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            RealTimeJsonScreen(this)
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+
     @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-        val jsonResponse = JSONResponse()
-        val battery = Battery(this)
-        val CPU = CPU()
-        val device = Device()
-        val RAM = RAM(this)
-        val storage = Storage()
-        val screen = Screen(this)
-        val sensor = Sensor(this)
-
-        val json = jsonResponse.createJSONResponse(
-            battery,
-            CPU,
-            device,
-            screen,
-            RAM,
-            sensor,
-            storage
-        )
-
+    fun SensorScreen(sensorText: String, modifier: Modifier = Modifier){
         Text(
-            text = """
-                ${json.getJSONObject("battery")}
-            """.trimIndent(),
+            text = sensorText,
             modifier = modifier
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+    @RequiresApi(TIRAMISU)
+    @Composable
+    fun RealTimeJsonScreen(context: Context) {
+        val jsonResponse = remember { JSONResponse(context) }
+        val jsonText by jsonResponse.completeJsonResponse
+
+        Text(
+            text = jsonText,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+
+    @RequiresApi(TIRAMISU)
+    @Composable
+    fun Greeting(name: String, modifier: Modifier = Modifier) {
+
+        val JSONResponse = JSONResponse(this)
+
+        Text(
+            text = "".trimIndent(),
+            modifier = modifier
+        )
+    }
+
+    @RequiresApi(TIRAMISU)
     @Preview(showBackground = true)
     @Composable
     fun GreetingPreview() {
@@ -79,4 +79,5 @@ class MainActivity : ComponentActivity() {
             Greeting("Android")
         }
     }
+
 }
