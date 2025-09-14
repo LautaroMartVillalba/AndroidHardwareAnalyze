@@ -104,7 +104,7 @@ class Battery(localContext: Context) {
         val temperature = (intent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1) / 10.0
 
         return """
-               Temp (°C): $temperature
+               $temperature
                """.trimIndent()
     }
 
