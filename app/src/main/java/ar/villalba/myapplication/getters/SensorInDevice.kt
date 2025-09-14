@@ -21,7 +21,7 @@ import android.hardware.SensorManager
  * @property gyroscope The default gyroscope sensor, if available.
  * @property barometer The default pressure sensor, if available.
  */
-class Sensor(localContext: Context) {
+class SensorInDevice(localContext: Context) {
 
     var sensorManager: SensorManager = localContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
