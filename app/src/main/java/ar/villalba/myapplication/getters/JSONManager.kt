@@ -11,7 +11,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 
 /**
@@ -22,53 +21,13 @@ import org.json.JSONObject
  * Each hardware/software component is serialized into a JSONObject
  * and appended to the final response object.
  */
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-class JSONResponse(localContext: Context) {
+class JSONManager(localContext: Context) {
     val context = localContext
-    val completeJsonResponse = mutableStateOf("Waiting for data...")
-    val availableRAM = mutableStateOf("Null")
-    val batteryTherm = mutableStateOf("Null")
-    val cpuCurrentFreq = mutableStateOf("Null")
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    init {
-        startUpdating()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun startUpdating(){
-        scope.launch {
-            while (isActive){
-                val ram = RAM(context)
-                availableRAM.value = ram.availableRam.toString()
-
-                val battery = Battery(context)
-                batteryTherm.value = battery.batteryTempAndVolt
-
-                val cpu = CPU()
-                cpuCurrentFreq.value = cpu.currentCoreFreq.toString()
-
-                val json = JSONObject().apply {
-                    append("device", deviceJson())
-                    append("cpu", CPUJson())
-                    append("battery", batteryJson())
-                    append("ram", ramJson())
-                    append("screen", screenJson())
-                    append("storage", storageJson())
-                }
-
-                completeJsonResponse.value = json.toString(4)
-
-                delay(500)
-            }
-        }
-    }
-
+    @RequiresApi(Build.VERSION_CODES.P)
     fun batteryJson(): JSONObject {
         val battery = Battery(context)
         val batteryJson = JSONObject()
-        batteryJson.put("percent", battery.batteryStatus)
         batteryJson.put("status", battery.batteryStatus)
         batteryJson.put("charging", battery.batteryCharging)
         batteryJson.put("temperature", battery.batteryTempAndVolt)
@@ -112,6 +71,7 @@ class JSONResponse(localContext: Context) {
         return RAMJson
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     fun screenJson(): JSONObject {
         val screen = Screen(context)
         val screenJson = JSONObject()
@@ -130,7 +90,4 @@ class JSONResponse(localContext: Context) {
         return storageJson
     }
 
-    fun stop(){
-        scope.cancel()
-    }
 }
