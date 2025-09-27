@@ -15,7 +15,6 @@ public class NanoLocalServer extends NanoHTTPD {
         this.localContext = context;
     }
 
-
     @Override
     public Response serve(IHTTPSession session) {
         String uri = session.getUri();
@@ -30,25 +29,46 @@ public class NanoLocalServer extends NanoHTTPD {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
             case "/api/v1/hardware/ram-sse":
                 try {
                     return ServiceController.stream(jsonManager::ramJson);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
             case "/api/v1/hardware/battery-sse":
                 try {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         return ServiceController.stream(jsonManager::batteryJson);
+                    }else {
+                        return newFixedLengthResponse(Response.Status.NOT_IMPLEMENTED, "text/plain",
+                                "Service not yet available in Android " + Build.VERSION.SDK_INT + ".");
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            case "/api/v1/hardware/sensors-sse":
-                try {
-                    return ServiceController.stream(jsonManager::ramJson);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+
+            case "/api/v1/hardware/device-static":
+                return newFixedLengthResponse(Response.Status.OK, "application/json",
+                        jsonManager.deviceJson().toString());
+
+            case "/api/v1/hardware/screen-static":
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    return newFixedLengthResponse(Response.Status.OK, "application/json",
+                            jsonManager.screenJson().toString());
+                } else {
+                    return newFixedLengthResponse(Response.Status.NOT_IMPLEMENTED, "text/plain",
+                            "Service not yet available in Android " + Build.VERSION.SDK_INT + ".");
+                }
+
+            case "/api/v1/hardware/storage-static":
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    return newFixedLengthResponse(Response.Status.OK, "application/json",
+                            jsonManager.storageJson().toString());
+                } else {
+                    return newFixedLengthResponse(Response.Status.NOT_IMPLEMENTED, "text/plain",
+                            "Service not yet available in Android " + Build.VERSION.SDK_INT + ".");
                 }
 
             default:

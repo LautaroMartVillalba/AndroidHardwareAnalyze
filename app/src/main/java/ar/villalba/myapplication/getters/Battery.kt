@@ -6,6 +6,7 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.Build
 import androidx.annotation.RequiresApi
+import org.json.JSONObject
 
 /**
  * The Battery class provides detailed information about the device's battery state.
@@ -42,7 +43,7 @@ class Battery(localContext: Context) {
      * @return A formatted string with the current battery percentage and status.
      */
     @RequiresApi(Build.VERSION_CODES.P)
-    fun obtainBatteryStatus(): String {
+    fun obtainBatteryStatus(): JSONObject {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         val percent = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
@@ -57,10 +58,10 @@ class Battery(localContext: Context) {
             else -> "N/A"
         }
 
-        return """
-            Percent: $percent%
-            Status: $statusString
-            """.trimIndent()
+        val batteryJson = JSONObject()
+        batteryJson.put("percent", percent)
+        batteryJson.put("status", statusString)
+        return batteryJson
     }
 
     /**
