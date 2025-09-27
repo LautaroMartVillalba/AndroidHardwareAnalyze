@@ -37,11 +37,25 @@ class JSONManager(localContext: Context) {
     fun CPUJson(): JSONObject {
         val cpu = CPU()
         val CPUJson = JSONObject()
-        CPUJson.put("cores", cpu.numberOfCores)
-        CPUJson.put("currentFreq", cpu.currentCoreFreq)
-        CPUJson.put("minFreq", cpu.minCoreFreq)
-        CPUJson.put("maxFreq", cpu.maxCoreFreq)
+
+        val minFreqs = cpu.minCoreFreq
+        val maxFreqs = cpu.maxCoreFreq
+        val currentFreqs = cpu.currentCoreFreq
+        val totalCores = cpu.numberOfCores.toInt()
+
+        val coresJson = JSONObject()
+
+        for (i in 0 until totalCores) {
+            val coreJson = JSONObject()
+            coreJson.put("minFreq", minFreqs[i])
+            coreJson.put("maxFreq", maxFreqs[i])
+            coreJson.put("currentFreq", currentFreqs[i])
+            coresJson.put("core${i + 1}", coreJson)
+        }
+
         CPUJson.put("name", cpu.cpuName)
+        CPUJson.put("cores", coresJson)
+
         return CPUJson
     }
 
