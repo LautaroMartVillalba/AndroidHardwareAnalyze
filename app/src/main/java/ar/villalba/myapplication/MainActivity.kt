@@ -1,83 +1,41 @@
 package ar.villalba.myapplication
 
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.os.Build
-import android.os.Build.VERSION_CODES.TIRAMISU
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ar.villalba.myapplication.getters.*
-import ar.villalba.myapplication.ui.theme.MyApplicationTheme
+import androidx.core.content.ContextCompat
+import ar.villalba.myapplication.server.ServerActivity
 
 class MainActivity : ComponentActivity() {
 
-    @RequiresApi(TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val intent = Intent(this, ServerActivity::class.java)
+        ContextCompat.startForegroundService(this, intent)
+
         enableEdgeToEdge()
         setContent {
-            RealTimeJsonScreen(this)
+            SimpleTextCall()
         }
     }
 
-
     @Composable
-    fun SensorScreen(sensorText: String, modifier: Modifier = Modifier){
+    fun SimpleTextCall() {
         Text(
-            text = sensorText,
-            modifier = modifier
-        )
-    }
-
-    @RequiresApi(TIRAMISU)
-    @Composable
-    fun RealTimeJsonScreen(context: Context) {
-        val jsonResponse = remember { JSONResponse(context) }
-        val jsonText by jsonResponse.completeJsonResponse
-
-        Text(
-            text = jsonText,
+            text = "Go to your browser!",
             modifier = Modifier.padding(16.dp)
         )
     }
 
-    @RequiresApi(TIRAMISU)
-    @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-
-        val JSONResponse = JSONResponse(this)
-
-        Text(
-            text = "".trimIndent(),
-            modifier = modifier
-        )
+    override fun onDestroy() {
+        super.onDestroy()
     }
-
-    @RequiresApi(TIRAMISU)
-    @Preview(showBackground = true)
-    @Composable
-    fun GreetingPreview() {
-        MyApplicationTheme {
-            Greeting("Android")
-        }
-    }
-
 }
