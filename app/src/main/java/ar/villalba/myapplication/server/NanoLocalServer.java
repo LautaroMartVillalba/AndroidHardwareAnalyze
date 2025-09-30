@@ -51,6 +51,10 @@ public class NanoLocalServer extends NanoHTTPD {
                     return streamSafeResponseAbstraction(jsonManager::batteryJson);
                 }
 
+            case "/api/" + API_VERSION + "/hardware/sensors-sse":
+                return ServiceController.sensorStream(sensorInDevice);
+
+
             case "/api/" + API_VERSION + "/hardware/device-static":
                 return newFixedLengthResponse(Response.Status.OK, "application/json",
                         jsonManager.deviceJson().toString());
