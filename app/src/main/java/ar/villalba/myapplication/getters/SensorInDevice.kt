@@ -2,7 +2,11 @@ package ar.villalba.myapplication.getters
 
 import android.content.Context
 import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import org.json.JSONObject
+import kotlin.let
 
 /**
  * The Sensor class provides access to the device’s built-in hardware sensors.
@@ -13,23 +17,50 @@ import android.hardware.SensorManager
  * Some sensors may be unavailable on certain devices, in which case
  * their value will be `null`.
  *
- * @property sensorManager The system service used to manage and access sensors.
- * @property accelerometer The default accelerometer sensor, if available.
- * @property light The default ambient light sensor, if available.
- * @property proximity The default proximity sensor, if available.
- * @property magnetometer The default magnetic field sensor, if available.
- * @property gyroscope The default gyroscope sensor, if available.
- * @property barometer The default pressure sensor, if available.
+
  */
-class SensorInDevice(localContext: Context) {
+class SensorInDevice(localContext: Context): SensorEventListener {
 
     var sensorManager: SensorManager = localContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val sensorData: MutableMap<String, JSONObject> = mutableMapOf()
+    var onUpdateCallback: (() -> Unit)? = null
 
-    val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    val light: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
-    val proximity: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
-    val magnetometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-    val gyroscope: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-    val barometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
+    fun start(){
+        listOf(
+            Sensor.TYPE_ACCELEROMETER,
+            Sensor.TYPE_LIGHT,
+            Sensor.TYPE_MAGNETIC_FIELD,
+            Sensor.TYPE_GYROSCOPE,
+            Sensor.TYPE_PROXIMITY,
+            Sensor.TYPE_PRESSURE
+        ).forEach { type ->
+            sensorManager.getDefaultSensor(type)?.also {
+                sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+            }
+        }
+    }
+
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        return Unit
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        event?.let {
+            val valuesJson = JSONObject()
+            it.values.forEachIndexed { index, value -> valuesJson.put("v$index", value)}
+            sensorData[it.sensor.name] = valuesJson
+
+            onUpdateCallback?.invoke()
+        }
+    }
+
+    fun toJson(): JSONObject {
+        val json = JSONObject()
+        for ((name, values) in sensorData) {
+            json.put(name, values)
+        }
+        return json
+    }
 
 }

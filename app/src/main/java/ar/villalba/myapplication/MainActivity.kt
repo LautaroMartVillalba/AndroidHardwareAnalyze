@@ -11,14 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import ar.villalba.myapplication.server.ServerActivity
+import ar.villalba.myapplication.server.ServerService
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val intent = Intent(this, ServerActivity::class.java)
+        val intent = Intent(this, ServerService::class.java)
         ContextCompat.startForegroundService(this, intent)
 
         enableEdgeToEdge()

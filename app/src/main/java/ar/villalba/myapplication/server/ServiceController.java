@@ -1,11 +1,13 @@
 package ar.villalba.myapplication.server;
 
 import android.util.Log;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.function.Supplier;
+import ar.villalba.myapplication.getters.SensorInDevice;
 import fi.iki.elonen.NanoHTTPD;
 
 public class ServiceController {
@@ -19,6 +21,8 @@ public class ServiceController {
                 NanoHTTPD.Response.Status.OK,
                 "text/event-stream",
                 input);
+        sseResponse.addHeader("Cache-Control", "public");
+        sseResponse.addHeader("Connection", "keep-alive");
 
         new Thread(() -> {
             try {
@@ -40,6 +44,38 @@ public class ServiceController {
             }
         }).start();
 
+        return sseResponse;
+    }
+
+    public static NanoHTTPD.Response sensorStream(SensorInDevice sensorInDevice){
+        PipedInputStream input = new PipedInputStream();
+        PipedOutputStream output;
+
+        try {
+            output = new PipedOutputStream(input);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        NanoHTTPD.Response sseResponse = NanoHTTPD.newChunkedResponse(
+            NanoHTTPD.Response.Status.OK,
+            "text/event-stream",
+            input);
+        sseResponse.addHeader("Cache-Control", "no-cache");
+        sseResponse.addHeader("Connection", "keep-alive");
+
+        sensorInDevice.setOnUpdateCallback(() ->{
+            try{
+                JSONObject json = sensorInDevice.toJson();
+
+                String data = "data: " + json.toString(4) + "\n\n";
+                output.write(data.getBytes());
+                output.flush();
+            } catch (JSONException | IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        });
         return sseResponse;
     }
 
