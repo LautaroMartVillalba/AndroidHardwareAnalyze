@@ -19,6 +19,8 @@ public class ServiceController {
                 NanoHTTPD.Response.Status.OK,
                 "text/event-stream",
                 input);
+        sseResponse.addHeader("Cache-Control", "public");
+        sseResponse.addHeader("Connection", "keep-alive");
 
         new Thread(() -> {
             try {
