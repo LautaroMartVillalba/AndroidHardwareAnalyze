@@ -128,6 +128,20 @@ public class NanoLocalServer extends NanoHTTPD {
 
                 return withCORS(resp);
 
+            case "/shutdown":
+                new Thread(() -> {
+                    try{
+                        Thread.sleep(500);
+                        sensorInDevice.stop();
+                        this.stopSv();
+                        android.os.Process.killProcess(android.os.Process.myPid());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+                return newFixedLengthResponse(
+                        Response.Status.OK, "text/plane",
+                        "Server stopped.");
             default:
                 return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain",
                         "Endpoint not found");
