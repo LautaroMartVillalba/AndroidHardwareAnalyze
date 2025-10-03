@@ -6,7 +6,7 @@
     "description": "API local embebida en la app - provee información de hardware en tiempo real (SSE) y datos estáticos"
   },
   "servers": [
-    { "url": "http://192.168.100.11:5200", "description": "Servidor Local" }
+    { "url": "http://localhost:5200", "description": "Servidor Local" }
   ],
   "paths": {
     "/api/v1/hardware/cpu": {
