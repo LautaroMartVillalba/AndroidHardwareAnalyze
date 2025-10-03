@@ -110,6 +110,12 @@ public class NanoLocalServer extends NanoHTTPD {
                     );
                 }
 
+            case "/docs":
+                Response redirect = newFixedLengthResponse("");
+                redirect.setStatus(Response.Status.REDIRECT); // HTTP 302
+                redirect.addHeader("Location", "/swagger/index.html");
+                return redirect;
+
             case "/swagger/index.html":
                 return serveAsset("swagger-ui/index.html", "text/html");
 
