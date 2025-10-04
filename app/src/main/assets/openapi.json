@@ -1,0 +1,154 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Hardware Analyzer API",
+    "version": "v1",
+    "description": "API local embebida en la app - provee información de hardware en tiempo real (SSE) y datos estáticos"
+  },
+  "servers": [
+    { "url": "http://localhost:5200", "description": "Servidor Local" }
+  ],
+  "paths": {
+    "/api/v1/hardware/cpu": {
+      "get": {
+        "summary": "Estado de CPU en tiempo real",
+        "description": "Emite eventos SSE cada 1s con información de CPU. No lo intentes, no te va a cargar la respuesta porque es un Stream de datos.",
+        "responses": {
+          "200": {
+            "description": "Stream SSE",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "json",
+                  "example": "data: {\n    \"name\": \"Hardware\\t: MT6762V\\/WD\",\n    \"cores\": {\n        \"core1\": {\n            \"minFreq\": 900,\n            \"maxFreq\": 1801,\n            \"currentFreq\": 1801\n        },\n        \"core2\": {\n            \"minFreq\": 900,\n            \"maxFreq\": 1801,\n            \"currentFreq\": 1801\n        },\n        \"core3\": {\n            \"minFreq\": 900,\n            \"maxFreq\": 1801,\n            \"currentFreq\": 1801\n        }\n    }\n}"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hardware/ram": {
+      "get": {
+        "summary": "Uso de RAM en tiempo real",
+        "description": "Stream SSE con información de memoria RAM. No lo intentes, no te va a cargar la respuesta porque es un Stream de datos.",
+        "responses": {
+          "200": {
+            "description": "Stream SSE",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "json",
+                  "example": "data: {\n    \"total\": 3827,\n    \"available\": 1296\n}"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hardware/battery": {
+      "get": {
+        "summary": "Estado de batería en tiempo real",
+        "description": "Stream SSE con porcentaje y estado de batería. No lo intentes, no te va a cargar la respuesta porque es un Stream de datos.",
+        "responses": {
+          "200": {
+            "description": "Stream SSE",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "json",
+                  "example": "data: {\n    \"status\": {\n        \"percent\": 75,\n        \"status\": \"Discharging\"\n    },\n    \"charging\": \"Charging by: N\\/A\",\n    \"temperature\": \"27.4\"\n}"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hardware/sensors": {
+      "get": {
+        "summary": "Sensores en tiempo real",
+        "description": "Stream SSE con datos de sensores del dispositivo. No lo intentes, no te va a cargar la respuesta porque es un Stream de datos.",
+        "responses": {
+          "200": {
+            "description": "Stream SSE",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "json",
+                  "example":  "data: {\n    \"LIGHT\": {\n        \"v0\": 0,\n        \"v1\": 0,\n        \"v2\": 0,\n        \"v3\": 0,\n        \"v4\": 0,\n        \"v5\": 0,\n        \"v6\": 0,\n        \"v7\": 0\n    },\n    \"PROXIMITY\": {\n        \"v0\": 1,\n        \"v1\": 0\n    },\n    \"ACCELEROMETER\": {\n        \"v0\": 0.63195,\n        \"v1\": 0.27705002,\n        \"v2\": 9.346951\n    },\n    \"MAGNETOMETER\": {\n        \"v0\": 5.8875003,\n        \"v1\": -66.24375,\n        \"v2\": -127.162506\n    }\n}"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hardware/device": {
+      "get": {
+        "summary": "Información del dispositivo",
+        "description": "Devuelve un JSON con datos generales del dispositivo.",
+        "responses": {
+          "200": {
+            "description": "JSON de dispositivo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "json",
+                  "schema": "{\n    \"model\": \"x1\",\n    \"device\": \"x2\",\n    \"brand\": \"Android\",\n    \"manufacturer\": \"Samsung\",\n    \"androidVersion\": \"18\",\n    \"patchVersion\": \"2023-10-05\",\n    \"kernelVersion\": \"4.19.127-00001-g78330b0-clean\",\n    \"sdkVersion\": 30,\n    \"hardware\": \"mt6762\",\n    \"display\": \"RP1A.200720.011 release-keys\",\n    \"product\": \"x3\",\n    \"architecture\": \"aarch64\"\n}"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hardware/screen": {
+      "get": {
+        "summary": "Información de pantalla",
+        "description": "Devuelve un JSON con datos de la pantalla (si es soportado por la versión de API del dipositivo).",
+        "responses": {
+          "200": {
+            "description": "JSON de pantalla",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "json",
+                  "example": "{\n    \"resolution\": \"720x1600\",\n    \"density\": \"2.0 (dpi: 320)\",\n    \"refreshRate\": \"60.0 Hz\" }"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "No soportado en esta versión de Android"
+          }
+        }
+      }
+    },
+    "/api/v1/hardware/storage": {
+      "get": {
+        "summary": "Información de almacenamiento",
+        "description": "Devuelve un JSON con datos de almacenamiento (si es soportado por la versión de API del dipositivo).",
+        "responses": {
+          "200": {
+            "description": "JSON de almacenamiento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": "{\n    \"total\": 50786,\n    \"rest\": 2209,\n    \"used\": 48577\n}"
+                }
+              }
+            }
+          },
+          "501": {
+            "description": "No soportado en esta versión de Android"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  }
+}

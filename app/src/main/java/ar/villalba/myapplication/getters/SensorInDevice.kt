@@ -40,6 +40,9 @@ class SensorInDevice(localContext: Context): SensorEventListener {
         }
     }
 
+    fun stop() {
+        sensorManager.unregisterListener(this)
+    }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         return Unit

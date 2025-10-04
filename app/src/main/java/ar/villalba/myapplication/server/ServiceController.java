@@ -23,6 +23,9 @@ public class ServiceController {
                 input);
         sseResponse.addHeader("Cache-Control", "public");
         sseResponse.addHeader("Connection", "keep-alive");
+        sseResponse.addHeader("Access-Control-Allow-Origin", "*");
+        sseResponse.addHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+        sseResponse.addHeader("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization");
 
         new Thread(() -> {
             try {
